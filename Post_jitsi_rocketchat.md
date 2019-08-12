@@ -171,15 +171,17 @@ MONGO_OPLOG_URL=mongodb://localhost:27017/local?replicaSet=rs01
 ROOT_URL=http://jitchat.4linux.com.br:3000
 PORT=3000
 ```
-# Nos comandos a seguir, habilitaremos configurações necessárias ao funcionamento do MongoDB e em seguida habilitaremos os serviços do MongoDB e Rocket.Chat. [VALIDAR INFORMAÇÔES DOS COMANDOS]
+Nos comandos a seguir, habilitaremos configurações necessárias ao funcionamento do MongoDB (parâmetros *engine* e *replicaset*, responsáveis sobre como serão administrados os dados armazenados no banco e também por redundância e alta disponibilidade do Banco de Dados).
 
 ```shell
 sed -i "s/^#  engine:/  engine: mmapv1/"  /etc/mongod.conf
 ```
+
 ```shell
-sudo sed -i "s/^#replication:/replication:\n  replSetName: rs01/" /etc/mongod.conf
+sed -i "s/^#replication:/replication:\n  replSetName: rs01/" /etc/mongod.conf
 ```
-Habilitando e iniciando o serviço do MongoDB
+
+Habilitando e iniciando o serviço do MongoDB.
 ```shell
 sudo systemctl enable mongod && sudo systemctl start mongod
 ```
@@ -188,7 +190,7 @@ sudo systemctl enable mongod && sudo systemctl start mongod
 mongo --eval "printjson(rs.initiate())"
 ```
 
-Habilitando e iniciando o serviço do Rocket.Chat
+Habilitando e iniciando o serviço do Rocket.Chat.
 ```shell
 sudo systemctl enable rocketchat && sudo systemctl start rocketchat
 ```
@@ -259,7 +261,9 @@ Rule added
 Rule added (v6)
 ```
 
-### [Validar acesso ao videobridge]
+A habilitação das portas UDP entre 10000 e 20000, só será realmente necessária caso sejam utilizados os serviços *Jigasi* (para integrar *Soft Phones* ao Jitsi) ou *Jitsi-Hammer* (programa utilizado para simular usuários acessando o Jitsi gerando tráfego RTP para esses usuários *falsos*).
+
+Apesar de não utilizarmos estes recursos, vamos seguir a instalação padrão habilitando o acesso às portas.
 
 ```shell
 ufw allow in 10000:20000/udp
@@ -365,6 +369,7 @@ gpg: key EF8B479E2DC1389C: public key "Jitsi <dev@jitsi.org>" imported
 gpg: no ultimately trusted keys found
 gpg: Total number processed: 1
 gpg:               imported: 1
+
 ```
 
 Agora, nós checaremos quem assinou esta chave e quem está atestando a validade dela.
@@ -414,8 +419,6 @@ Esses passos foram realizados para nos certificarmos que os pacotes que estamos 
 
 ```shell
 apt-key add jitsi-key.gpg.key
-
-OK
 ```
 
 Depois de adicionar a chave, devemos adicionar a entrada do endereço do repositorio Jitsi.
@@ -461,9 +464,9 @@ apt install jitsi-meet -y
 
 Durante a instalação do pacote, nos depararemos com uma tela com o título **"Configuring jitsi-videobridge"**, nesta etapa informaremos o *DNS name* (ou endereço IP) que foi definido durante o "Passo 1".
 
-No meu caso, utilizei o "*jitchat.4linux.com.br*" como definido inicialmente.
+![Configuring jitsi-videobridge](/assets/Configuring%20jitsi-videobridge.png)
 
-# Adicionar figura correspondente [CONFIGURING JITSI MEET]
+No meu caso, utilizei o "*jitchat.4linux.com.br*" como definido inicialmente.
 
 Após inserir o *DNS name* entraremos na tela com o título **"Configuring jitsi-meet-web-config"**, nesta tela serão expostas as opções relacionadas ao certificado SSL a ser utilizado na aplicação. Por ora, utilizaremos um certificado auto-assinado e posteriormente utilizaremos um certificado criado a partir do LetsEncrypt.
 
@@ -543,37 +546,39 @@ Agora que temos as duas aplicações funcionando, poderemos acessá-las via brow
 
 Vamos começar acessando a interface web para realizar as últimas configurações antes de iniciarmos a utilização do Rocket.Chat, para isso abra o seu browser e acesse a URL correspondente. No meu caso, utilizei https://rocket.4linux.com.br. Ao acessá-la pela primeira vez será exibido o *Setup Wizard* da aplicação, conforme imagem a seguir:
 
-## [Setup Wizard 1 em branco]
+![Rocket.Chat - Setup Wizard 1](/assets/Rocket.Chat%20-%20Setup%20Wizard%201.png)
 
 Após preenchermos os campos **Nome**, **Nome de usuário**, **E-mail** e **Senha** basta clicar em continuar.
 
-## [Setup wizard 1 preenchido]
+![Rocket.Chat - Setup Wizard 1 - preenchido](/assets/Rocket.Chat%20-%20Setup%20Wizard%201%20-%20preenchido.png)
 
 Após clicar em continuar, será exibida outra página solicitando mais informações, basta preenchê-las conforme sua necessidade e clicar em continuar.
 
-## [Setup wizard 2 preenchido]
+![Rocket.Chat - Setup Wizard 2 - preenchido](/assets/Rocket.Chat%20-%20Setup%20Wizard%202%20-%20preenchido.png)
 
 Ao preenchermos a segunda página, nos depararemos com mais uma página (esta será a penúltima). No campo **"Nome do Site"**, devemos colocar o título do site que queremos que seja exibido no browser, no campo **"Idioma"** pode ser mantido o padrão e no campo **"Tipo de servidor"** devemos selecionar a opção comunidade.
 
-## [Setup wizard 3 preenchido]
+![Rocket.Chat - Setup Wizard 3 - preenchido](/assets/Rocket.Chat%20-%20Setup%20Wizard%203%20-%20preenchido.png)
 
 Pronto, estamos na última página do *Setup Wizard*, basta selecionar a opção **"Mantenha-se autônomo, você precisará""** e clicar em continuar.
 
-## [Setup wizard 4 preenchido]
+![Rocket.Chat - Setup Wizard 4 - preenchido](/assets/Rocket.Chat%20-%20Setup%20Wizard%204%20-%20preenchido.png)
 
 Ao clicar na opção da última página seremos redirecionados para uma outra que nos informará que o ambiente está pronto, basta clicar no botão de confirmação e seremos redirecionados para a *Home* do Rocket.Chat.
 
 No menu presente no lado esquerdo da página teremos um link de opções, ao clicarmos nele será exibido um outro link para a página de **Administração** da aplicação. Conforme imagem abaixo:
 
-## [Home Rocket.Chat]
 
+![Rocket.Chat - Home](/assets/Rocket.Chat%20-%20Home.png)
 Quando acessarmos a página de Administração, deveremos ir até o final da lista de opções exibida à esquerda. Ao chegarmos no fim da barra de rolagem, veremos a opção **Vídeo Conferência**, clique nela.
 
-## [Administração Rocket.Chat]
+
+![Rocket.Chat - Administracao](/assets/Rocket.Chat%20-%20Administracao.png)
 
 Será exibida uma nova página com duas opções de tecnologias de vídeoconferências, **BigBlueButton** e **Jitsi**.
 
-## [Videoconferencia - config]
+![Rocket.Chat - videoconf config](/assets/Rocket.Chat%20-%20videoconf%20config.png)
+
 
 Ao clicarmos em **Jitsi**, chegaremos ao último passo da integração das ferramentas!
 
@@ -594,7 +599,7 @@ Nesta página serão exibidas as opções relacionadas ao Jitsi. Aqui, basta mar
 - Chrome Extension ID: Não é necessário alterar
 
 
-## [Video config 2]
+![Rocket.Chat - videoconf config 2](/assets/Rocket.Chat%20-%20videoconf%20config%202.png)
 
 Após definir estas configurações, basta salvar as alterações.
 Pronto, o RocketChat está integrado ao Jitsi para realização de videoconferências!
@@ -603,15 +608,15 @@ Por fim, devemos testar se todas as configurações que definimos funcionaram co
 
 Ao clicar no ícone, será aberto um sub-menu com a opção Vídeo Chat, clique nele.
 
-## [videoconf chat 1]
+![Rocket.Chat - videoconf chat 1](/assets/Rocket.Chat%20-%20videoconf%20chat%201.png)
 
 Será exibida uma janela menor perguntando se o usuário deseja iniciar uma videoconferência.
 
-## [videoconf chat 2]
+![Rocket.Chat - videoconf chat 2](/assets/Rocket.Chat%20-%20videoconf%20chat%202.png)
 
 Caso a opção **Sim** seja escolhida, será aberta uma nova janela correspondente a sala de conferência. Aqui, o browser checará se o usuário deseja compartilhar dados a partir da câmera e microfone, clique em permitir para conseguir acessar os recursos.
 
-## [videoconf chat 3]
+![Rocket.Chat - videoconf chat 3](/assets/Rocket.Chat%20-%20videoconf%20chat%203.png)
 
 Na imagem anterior podemos ver o Jitsi em funcionamento, caso os utilizadores queiram adicionar mais participantes à conferência, basta compartilhar a URL da sala.
 
